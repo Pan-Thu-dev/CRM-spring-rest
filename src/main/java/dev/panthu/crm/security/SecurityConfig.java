@@ -34,35 +34,40 @@ public class SecurityConfig {
         return userDetailsManager;
     }
 
-    /*
-    @Bean
-    public InMemoryUserDetailsManager userDetailsManager() throws Exception {
-        UserDetails anon = User.builder()
-                .username("anon")
-                .password("{noop}password")
-                .roles("EMPLOYEE")
-                .build();
 
-        UserDetails john = User.builder()
-                .username("john")
-                .password("{noop}password")
-                .roles("EMPLOYEE", "MANAGER")
-                .build();
+//    @Bean
+//    public InMemoryUserDetailsManager userDetailsManager() throws Exception {
+//        UserDetails anon = User.builder()
+//                .username("anon")
+//                .password("{noop}password")
+//                .roles("EMPLOYEE")
+//                .build();
+//
+//        UserDetails john = User.builder()
+//                .username("john")
+//                .password("{noop}password")
+//                .roles("EMPLOYEE", "MANAGER")
+//                .build();
+//
+//        UserDetails berk = User.builder()
+//                .username("berk")
+//                .password("{noop}password")
+//                .roles("EMPLOYEE", "MANAGER", "ADMIN")
+//                .build();
+//
+//        return new InMemoryUserDetailsManager(anon, john, berk);
+//    }
 
-        UserDetails berk = User.builder()
-                .username("berk")
-                .password("{noop}password")
-                .roles("EMPLOYEE", "MANAGER", "ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(anon, john, berk);
-    }
-    */
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(configurer ->
                 configurer
+                        .requestMatchers("/customers/list").hasRole("EMPLOYEE")
+                        .requestMatchers("/customers/showForm").hasRole("MANAGER")
+                        .requestMatchers("/customers/showFormForUpdate").hasRole("MANAGER")
+                        .requestMatchers("/customers/save").hasRole("MANAGER")
+                        .requestMatchers("/customers/delete").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "api/customers").hasRole("EMPLOYEE")
                         .requestMatchers(HttpMethod.GET, "api/customers/**").hasRole("EMPLOYEE")
                         .requestMatchers(HttpMethod.POST, "api/customers").hasRole("MANAGER")
