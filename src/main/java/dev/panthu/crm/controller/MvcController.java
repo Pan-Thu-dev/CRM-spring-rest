@@ -10,15 +10,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import dev.panthu.crm.dao.CustomerRepository;
 import dev.panthu.crm.entity.Customer;
+import dev.panthu.crm.exception.CustomerNotFoundException;
 
 @Controller
 @RequestMapping("/customers")
-public class MVCController {
+public class MvcController {
 
     private CustomerRepository customerRepository;
 
     @Autowired
-    public MVCController(CustomerRepository customerRepository) {
+    public MvcController(CustomerRepository customerRepository) {
         this.customerRepository = customerRepository;
     }
 
@@ -37,7 +38,7 @@ public class MVCController {
     @GetMapping("/showFormForUpdate")
     public String showFormForUpdate(@RequestParam("customerId") int id, Model model) {
         Customer customer = customerRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Customer not found - " + id));
+            .orElseThrow(() -> new CustomerNotFoundException("Customer not found with id: " + id));
         model.addAttribute("customer", customer);
         return "customer/customer-form";
     }
@@ -50,6 +51,9 @@ public class MVCController {
 
     @GetMapping("/delete")
     public String delete(@RequestParam("customerId") int id) {
+        if (!customerRepository.existsById(id)) {
+            throw new CustomerNotFoundException("Customer not found with id: " + id);
+        }
         customerRepository.deleteById(id);
         return "redirect:/customers/list";
     }

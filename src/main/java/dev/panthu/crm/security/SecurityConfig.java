@@ -63,6 +63,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(configurer ->
                 configurer
+                        .requestMatchers("/access-denied").permitAll()  // Allow access to error page
                         .requestMatchers("/customers/list").hasRole("EMPLOYEE")
                         .requestMatchers("/customers/showForm").hasRole("MANAGER")
                         .requestMatchers("/customers/showFormForUpdate").hasRole("MANAGER")
@@ -75,8 +76,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "api/customers/**").hasRole("ADMIN")
         );
 
-        http.httpBasic(Customizer.withDefaults());
+        // Configure custom access denied handler
+        http.exceptionHandling(configurer ->
+                configurer
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.sendRedirect(request.getContextPath() + "/access-denied");
+                        })
+        );
 
+        http.httpBasic(Customizer.withDefaults());
         http.csrf(csrf -> csrf.disable());
 
         return http.build();
