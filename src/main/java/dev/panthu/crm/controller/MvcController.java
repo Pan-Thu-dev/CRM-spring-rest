@@ -3,11 +3,7 @@ package dev.panthu.crm.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import dev.panthu.crm.dao.CustomerRepository;
 import dev.panthu.crm.entity.Customer;
 import dev.panthu.crm.exception.CustomerNotFoundException;
@@ -24,8 +20,13 @@ public class MvcController {
     }
 
     @GetMapping("/list")
-    public String listCustomers(Model model) {
-        model.addAttribute("customers", customerRepository.findAll());
+    public String listCustomers(@RequestParam(value = "search", required = false) String searchTerm, Model model) {
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            model.addAttribute("customers", customerRepository.searchCustomers(searchTerm.trim()));
+            model.addAttribute("searchTerm", searchTerm);
+        } else {
+            model.addAttribute("customers", customerRepository.findAll());
+        }
         return "customer/list";
     }
 

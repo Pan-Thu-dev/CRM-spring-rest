@@ -8,9 +8,21 @@
     <div class="container">
         <h2>Customer List</h2>
         
-        <a th:href="@{/customers/showForm}" class="btn btn-primary mb-3">
-            Add Customer
-        </a>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <form th:action="@{/customers/list}" method="GET" class="d-flex">
+                    <input type="text" name="search" th:value="${searchTerm}" 
+                           class="form-control me-2" placeholder="Search by name or email">
+                    <button type="submit" class="btn btn-outline-primary">Search</button>
+                    <a th:href="@{/customers/list}" class="btn btn-outline-secondary ms-2">Clear</a>
+                </form>
+            </div>
+            <div class="col-md-6 text-end">
+                <a th:href="@{/customers/showForm}" class="btn btn-primary">
+                    Add Customer
+                </a>
+            </div>
+        </div>
 
         <table class="table table-bordered table-striped">
             <thead class="table-dark">
@@ -35,6 +47,9 @@
                             Delete
                         </a>
                     </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(customers)}">
+                    <td colspan="4" class="text-center">No customers found</td>
                 </tr>
             </tbody>
         </table>
